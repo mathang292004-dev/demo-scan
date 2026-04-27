@@ -1,14 +1,28 @@
+name: Semgrep SAST Scan
 
-stages:
-  - sast
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
-semgrep-scan:
-  stage: sast
-  image: semgrep/semgrep:latest
-  script:
-    - semgrep scan --config p/nodejs --metrics=off --sarif --output semgrep-report.sarif .
-  artifacts:
-    reports:
-      sast: semgrep-report.sarif
-    paths:
-      - semgrep-report.sarif
+jobs:
+  semgrep:
+    name: Run Semgrep
+    runs-on: ubuntu-latest
+
+    container:
+      image: semgrep/semgrep:latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Semgrep scan
+        run: |
+          semgrep scan --config p/nodejs --metrics=off --sarif --output semgrep-report.sarif .
+
+      - name: Upload SARIF report
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-report.sarif
