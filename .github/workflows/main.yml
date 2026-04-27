@@ -6,9 +6,12 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   semgrep:
-    name: Run Semgrep
     runs-on: ubuntu-latest
 
     container:
