@@ -23,7 +23,7 @@ jobs:
 
       - name: Run Semgrep scan
         run: |
-          run: semgrep scan --config auto --metrics=off --sarif --output semgrep-report.sarif .
+          semgrep scan --config auto --metrics=off --sarif --output semgrep-report.sarif .
 
       - name: Upload SARIF report
         uses: github/codeql-action/upload-sarif@v3
