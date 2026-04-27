@@ -1,0 +1,80 @@
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: always
+    - when: never
+
+stages:
+  - deploy
+
+before_script:
+  - echo "$EC2_PRIVATE_KEY" > /tmp/private_key.pem
+  - chmod 600 /tmp/private_key.pem
+  - export SSHPATH="ssh -o StrictHostKeyChecking=no -i /tmp/private_key.pem"
+
+deploy_dev:
+  stage: deploy
+  image: node:20
+  script:
+    - echo "Deploying to Dev Server..."
+    - echo "Connecting to $EC2_USER@$DEV_EC2_HOST"
+    - |
+      ssh -o StrictHostKeyChecking=no -i /tmp/private_key.pem $EC2_USER@$DEV_EC2_HOST <<EOF
+        set -e  
+        echo "Checking if directory $PROJECT_NAME exists..."
+
+        if [ ! -d "/var/www/$PROJECT_NAME" ]; then
+          echo "Directory does not exist. Cloning repository..."
+          sudo git clone "https://$GIT_USERNAME:$GIT_TOKEN@$REPO_URL" /var/www/$PROJECT_NAME
+        fi
+          echo "Directory exists. Pulling latest changes..."
+          cd /var/www/$PROJECT_NAME
+          sudo git reset --hard origin/develop
+          sudo git checkout develop
+          sudo git pull "https://$GIT_USERNAME:$GIT_TOKEN@$REPO_URL"
+          
+          sudo npm install
+          sudo npm run build
+
+          pm2 restart "$PROJECT_NAME" || pm2 start dist/main.js --name "$PROJECT_NAME"
+          pm2 save
+
+        echo "Dev deployment complete."
+      EOF
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+
+deploy_prod:
+  stage: deploy
+  image: node:20
+  script:
+    - echo "Deploying frontend to Prod Server..."
+    - echo "Connecting to $EC2_USER@$PROD_EC2_HOST"
+    - |
+      ssh -o StrictHostKeyChecking=no -i /tmp/private_key.pem $EC2_USER@$PROD_EC2_HOST <<EOF
+        set -e  
+        echo "Checking if directory $PROJECT_NAME exists..."
+
+        if [ ! -d "/var/www/$PROJECT_NAME" ]; then
+          echo "Directory does not exist. Cloning repository..."
+          sudo git clone "https://$GIT_USERNAME:$GIT_TOKEN@$REPO_URL" /var/www/$PROJECT_NAME
+        fi
+          echo "Directory exists. Pulling latest changes..."
+          cd /var/www/$PROJECT_NAME
+          sudo git reset --hard origin/main
+          sudo git checkout main  
+          sudo git pull "https://$GIT_USERNAME:$GIT_TOKEN@$REPO_URL"
+          
+          sudo npm install
+          sudo npm run build
+
+          pm2 restart "$PROJECT_NAME" || pm2 start dist/main.js --name "$PROJECT_NAME"
+          pm2 save
+
+        echo "Dev deployment complete."
+        echo "Prod deployment complete."
+      EOF
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'

@@ -1,0 +1,418 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "HealthCheckMicroserviceController_checkHealthAUthMicroservice",
+        "summary": "Check health of auth microservice",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "auth service health status."
+          }
+        },
+        "tags": [
+          "Incident"
+        ]
+      }
+    },
+    "/incident/getincidentsList": {
+      "get": {
+        "operationId": "IncidentController_getAllIncidents",
+        "summary": "Get incidents with pagination, filtering, sorting, and search",
+        "parameters": [
+          {
+            "name": "filters",
+            "required": false,
+            "in": "query",
+            "description": "JSON stringified filters object",
+            "schema": {
+              "example": "{\"page\":0,\"limit\":50,\"incidentStatus\":\"active\"}",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of incidents with pagination info"
+          }
+        },
+        "tags": [
+          "Incident"
+        ]
+      }
+    },
+    "/incident/getIncidentById/{id}": {
+      "get": {
+        "operationId": "IncidentController_getIncidentById",
+        "summary": "Get incident by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Incident ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Incident retrieved successfully"
+          }
+        },
+        "tags": [
+          "Incident"
+        ]
+      }
+    },
+    "/incident/updateIncident": {
+      "post": {
+        "operationId": "IncidentController_updateIncident",
+        "summary": "Create a new incident",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Incident created successfully"
+          }
+        },
+        "tags": [
+          "Incident"
+        ]
+      }
+    },
+    "/incident/upload": {
+      "post": {
+        "operationId": "IncidentController_uploadFile",
+        "summary": "Upload multiple files (image/audio) and link to incident",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File uploaded successfully"
+          },
+          "500": {
+            "description": "File upload failed"
+          }
+        },
+        "tags": [
+          "Files & Audio"
+        ]
+      }
+    },
+    "/incident/delete": {
+      "post": {
+        "operationId": "IncidentController_deleteFile",
+        "summary": "Delete a file by its Cloudinary publicId",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "publicId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "publicId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File deleted successfully"
+          },
+          "500": {
+            "description": "File deletion failed"
+          }
+        },
+        "tags": [
+          "Files & Audio"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "summary": "Register a new user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "summary": "Login a user",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "summary": "Logout user",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Emergex",
+    "description": "Emergex Sample APIs",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "IncidentOverviewDTO": {
+        "type": "object",
+        "properties": {}
+      },
+      "AssetsDamageDTO": {
+        "type": "object",
+        "properties": {}
+      },
+      "PropertyDamageDTO": {
+        "type": "object",
+        "properties": {
+          "propertyType": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "propertyType",
+          "description",
+          "price"
+        ]
+      },
+      "FileMetadataDTO": {
+        "type": "object",
+        "properties": {
+          "fileUrl": {
+            "type": "string"
+          },
+          "publicId": {
+            "type": "string"
+          },
+          "fileType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "fileUrl",
+          "publicId",
+          "fileType"
+        ]
+      },
+      "UploadedFilesDTO": {
+        "type": "object",
+        "properties": {
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileMetadataDTO"
+            }
+          },
+          "audio": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileMetadataDTO"
+            }
+          },
+          "video": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileMetadataDTO"
+            }
+          }
+        }
+      },
+      "IncidentDTO": {
+        "type": "object",
+        "properties": {
+          "incidentId": {
+            "type": "string"
+          },
+          "reportedBy": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "Branch": {
+            "type": "string"
+          },
+          "reportedDate": {
+            "type": "string",
+            "example": "2025-08-12T06:02:36.665Z"
+          },
+          "severityLevel": {
+            "type": "string"
+          },
+          "incidentStatus": {
+            "type": "string"
+          },
+          "incidentOverview": {
+            "$ref": "#/components/schemas/IncidentOverviewDTO"
+          },
+          "AssetsDamage": {
+            "$ref": "#/components/schemas/AssetsDamageDTO"
+          },
+          "PropertyDamage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PropertyDamageDTO"
+            }
+          },
+          "uploadedFiles": {
+            "$ref": "#/components/schemas/UploadedFilesDTO"
+          }
+        },
+        "required": [
+          "incidentId",
+          "reportedBy",
+          "country",
+          "Branch",
+          "reportedDate",
+          "severityLevel",
+          "incidentStatus",
+          "incidentOverview",
+          "AssetsDamage",
+          "PropertyDamage"
+        ]
+      },
+      "Buffer": {
+        "type": "object",
+        "properties": {}
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userName",
+          "email",
+          "password"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      }
+    }
+  }
+}

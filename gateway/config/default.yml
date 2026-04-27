@@ -1,0 +1,13 @@
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  connectionString: redis://127.0.0.1:6379
+
+cloudinary:
+  cloud_name: dqa6xi8cn
+  api_key: 225377361495569
+  api_secret: iA6vRqRYi-qKFzEojKC1bkAV8ks
+
+jwt:
+  secret: secret

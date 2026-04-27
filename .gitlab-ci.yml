@@ -1,0 +1,13 @@
+stages:
+  - sast
+
+semgrep-scan:
+  stage: sast
+  image: semgrep/semgrep:latest
+  script:
+    - semgrep scan --config p/nodejs --metrics=off --sarif --output semgrep-report.sarif .
+  artifacts:
+    reports:
+      sast: semgrep-report.sarif
+    paths:
+      - semgrep-report.sarif

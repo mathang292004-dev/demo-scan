@@ -1,0 +1,15 @@
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+
+server:
+  host: localhost
+  port: 6379
+  url: redis://localhost:6379
+
+database:
+  uri: mongodb+srv://devarajsoftsuave:fixed@cluster0.2evizxg.mongodb.net/
+
+openai:
+  api_key: ""
